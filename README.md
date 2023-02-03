@@ -82,6 +82,10 @@ to another with comments, attachments, epics and sub-tasks.
 
 Source JIRA server configuration is picked up from `jiraconfig.py`.
 
+FIXME: document portfolio epics.
+
+    ./ask-jira.py export_import_issues_for_jql 'key = KEY-123' --portfolio-epics
+
 The task needs special configuration in `exportimportconfig.py` (see sample in
 `exportimportconfig-sample.py`):
 
