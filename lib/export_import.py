@@ -103,7 +103,16 @@ def _map_sub_epics(source_jira, dest_jira, source_issue, dest_issue, conf, resul
     for linked_issue in source_issue.fields.issuelinks:
         if linked_issue.type.name == conf.PORTFOLIO_EPIC_SUB_EPIC_SOURCE_LINK_NAME and hasattr(linked_issue, 'outwardIssue'):
             sub_epic = linked_issue.outwardIssue
-            new_sub_epic = _map_issue(source_jira, dest_jira, sub_epic, conf, result, None, True)
+            # Test if sub_epic already exists. Use that or create a new
+            # Search always returns an iterator, but it may be empty
+            # It then throws StopIteration, instead of giving us issue
+            new_sub_epic = None
+            try:
+                new_sub_epic = next(_already_imported(conf, dest_jira, sub_epic))
+                print('Issue', sub_epic, 'has already been imported, link only...')
+            except StopIteration:
+                new_sub_epic = _map_issue(source_jira, dest_jira, sub_epic, conf, result, None, True)
+            # Always create link, no matter if it was existing issue or new
             dest_jira.create_issue_link(type=conf.PORTFOLIO_EPIC_SUB_EPIC_TARGET_LINK_NAME,
                     inwardIssue=dest_issue.key,
                     outwardIssue=new_sub_epic.key)
